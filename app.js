@@ -5,6 +5,14 @@ require("dotenv").config();
 const PORT = process.env.PORT;
 const db = process.env.mongo;
 const route = require("./routes/prodRoutes");
+const cors = require('cors')
+
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"], 
+  }));
+
 //route
 
 app.use(express.json());

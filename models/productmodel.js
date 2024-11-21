@@ -1,27 +1,18 @@
-const mongoose = require("mongoose")
-const { type } = require("os")
-const { title } = require("process")
+const mongoose = require("mongoose");
 
-const prodSchema = mongoose.Schema({
-    title:{
-        type:String,
-        require:true
-    },
-    price:{
-        type:Number,
-        require:true
-    },
-    quantity:{
-        type:Number,
-        require:true,
-        min:1
-    },description:{
-        type:String,
-        require:true,
-        minlength:15
-    },
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  lastname: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String },
+  dob: { type: Date },
+  gender: { type: String },
+  password: { type: String, required: true },
+  country: { type: String },
+  state: { type: String },
+  pincode: { type: String }
+});
 
-})
-const Productmodel = mongoose.model("product",prodSchema);
+const User = mongoose.model("User", userSchema);
 
-module.exports = Productmodel;
+module.exports = User;
