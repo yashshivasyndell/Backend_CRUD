@@ -11,7 +11,7 @@ const signupValidation = (req, res, next) => {
         gender: joi.string().valid('male', 'female', 'other').required(),
         password: joi.string().min(8).required(),
         country: joi.string().required(),
-        state: joi.string().required(),
+        state: joi.string().allow(""),
         pincode: joi.string().pattern(/^\d{5,6}$/).required(),
     });
 
