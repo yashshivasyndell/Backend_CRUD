@@ -103,10 +103,10 @@ const clearcookies = (req, res) => {
       path:"/"
     }).status(200).json({
       success: true,
-      message: "Logged out successfully yash. Cookies cleared.",
+      message: "Logged out successfully. Cookies cleared.",
     });
   } catch (error) {
-    console.log("error ceom");
+    console.log("error come");
     res.status(500).json({
       message: "Error while clearing cookies",
       error: error.message,
