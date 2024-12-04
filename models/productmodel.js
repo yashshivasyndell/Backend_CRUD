@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   dob: { type: Date },
   gender: { type: String },
   password: { type: String, required: true },
+  Confpassword: { type: String },
   country: { type: String },
   state: { type: String },
   pincode: { type: String }

@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const isAuthenticated = async (req, res, next) => {
   try {
-    console.log(req.cookies , "iaibdi");
+    console.log(req.cookies);
     const {AuthToken} = req.cookies;
 
     if (!AuthToken) {

@@ -10,6 +10,11 @@ const signupValidation = (req, res, next) => {
         dob: joi.date().iso().required(),
         gender: joi.string().valid('male', 'female', 'other').required(),
         password: joi.string().min(8).required(),
+        ConfPassword: joi
+            .string()
+            .required()
+            .valid(joi.ref('password'))
+            .messages({ 'any.only': 'Passwords must match' }),
         country: joi.string().required(),
         state: joi.string().allow(""),
         pincode: joi.string().pattern(/^\d{5,6}$/).required(),
@@ -34,7 +39,7 @@ const loginValidation = (req, res, next) => {
     if (error) {
         return res.status(400).json({
             message: 'Bad request',
-            errors: error.details.map((err) => err.message), 
+            errors: error.details.map((err) => err.message),
         });
     }
     next();
