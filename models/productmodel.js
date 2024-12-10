@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   Confpassword: { type: String },
   country: { type: String },
   state: { type: String },
-  pincode: { type: String }
+  pincode: { type: String },
 });
 
 const User = mongoose.model("User", userSchema);

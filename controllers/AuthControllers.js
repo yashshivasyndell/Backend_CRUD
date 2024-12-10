@@ -37,7 +37,6 @@ const signup = async (req, res) => {
         .json({ message: "Email exists. You can login.", success: false });
     }
 
-    
     const newUsermodel = new User({
       name,
       lastname,

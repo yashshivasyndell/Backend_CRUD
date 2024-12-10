@@ -7,6 +7,7 @@ const db = process.env.mongo;
 const cors = require('cors');
 const cookieParser = require('cookie-parser')
 const Authroute = require('./routes/Authroute')
+const dataRoute = require('./routes/dataRoute')
 
 app.use(cors({
     origin: "http://localhost:5173",  
@@ -23,6 +24,7 @@ app.use(express.json());
 
 
 app.use('/auth',Authroute)
+app.use('/users',dataRoute)
 //Jwt authorization 
 
 // Test route
