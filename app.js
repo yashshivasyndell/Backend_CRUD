@@ -8,6 +8,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser')
 const Authroute = require('./routes/Authroute')
 const dataRoute = require('./routes/dataRoute')
+const wordsRoute = require('./routes/wordsRoute')
 
 app.use(cors({
     origin: "http://localhost:5173",  
@@ -16,7 +17,7 @@ app.use(cors({
     credentials: true,
 }));
 
-
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use('/auth',Authroute)
 app.use('/users',dataRoute)
+app.use('/words',wordsRoute)
 //Jwt authorization 
 
 // Test route
