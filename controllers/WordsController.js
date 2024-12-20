@@ -35,10 +35,10 @@ const deleteWord = async (req, res) => {
 
 // Homonym
 const addWordWithHomonym = async (req, res) => {
-    console.log("api congole");
+    console.log("api console");
     try {
         const { word, homonym } = req.body;
-        console.log("this is req body",req.body);
+        
         // Validate required fields
         if (!word || !homonym) {
             return res.status(400).json({ message: 'Both word and homonym are required' });
@@ -86,23 +86,21 @@ const deleteHomonym = async (req, res) => {
         }
 
         // Find the word and update its zoundslike array
-        const updatedWord = await Words.findOneAndUpdate(
-            { word },
-            { homonym }, 
-            { new: true }
+        const deletedword = await Words.findOneAndDelete(
+            {
+                word,
+                homonym
+            } 
         );
 
-        if (!updatedWord) {
-            return res.status(404).json({ message: 'Word not found' });
+        if (!deletedword) {
+            return res.status(404).json({ message: 'Word not found deleted already' });
         }
-
-        if (!updatedWord.zoundslike.includes(homonym)) {
-            return res.status(404).json({ message: 'Homonym not found in the word' });
-        }
+       
 
         res.status(200).json({
             message: 'Homonym deleted successfully',
-            word: updatedWord,
+            word: deletedword,
         });
     } catch (error) {
         console.error('Error deleting homonym:', error);
