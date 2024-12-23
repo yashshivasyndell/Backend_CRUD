@@ -134,7 +134,7 @@ const clearcookies = (req, res) => {
 const loadUser = async (req, res) => {
   try {
     const userId = req.id;
-     console.log("user id is ",req.id);
+     
     if (!userId) {
       return res.status(400).json({ message: 'User ID is missing' });
     }
