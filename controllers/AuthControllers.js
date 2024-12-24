@@ -65,7 +65,7 @@ const signup = async (req, res) => {
   }
 };
 
-//Login api
+//Admin Login api
 const login = async (req, res) => {
   try {
     const {
@@ -85,6 +85,7 @@ const login = async (req, res) => {
         .status(403)
         .json({ message: "password not matched", success: false });
     }
+    
     const jwtToken = jwt.sign(
       { email: user.email, _id: user._id },
       process.env.jwt_secret,
@@ -111,6 +112,47 @@ const login = async (req, res) => {
     });
   }
 };
+
+//User login
+const userLogin =async (req,res)=>{
+  try{const {email,password} = req.body
+
+  const normalUser =await User.findOne({email})
+  const UserPassCompare = await bcrypt.compare(password,normalUser.password)
+  if(!UserPassCompare){
+    res.status(401).json({
+      message:'Wrong email or not existing',
+      success:false
+    })
+  }
+
+  const UserJwt = jwt.sign(
+    { email: normalUser.email, _id: normalUser._id },
+      process.env.jwt_secret,
+      { expiresIn: "24h" }
+  )
+
+  const UserCookie = {
+    httpOnly:true
+  }
+  res.status(200).cookie("UserToken", UserJwt , UserCookie).json({
+    message: "User Logged In successfully",
+    success: true,
+    UserJwt,
+    email,
+    name: normalUser.name,
+    user: normalUser
+  })
+}catch(error){
+  console.log(error);
+  res.status(500).json({
+    message: "Internal server error is there",
+    error: error,
+    success: false,
+  });
+  }
+  
+}
 //Clear cookies
 const clearcookies = (req, res) => {
   try {
@@ -211,4 +253,4 @@ const loadUser = async (req, res) => {
 
 
 
-module.exports = { signup, login,loadUser,clearcookies,resetPassword };
+module.exports = { signup, login,loadUser,clearcookies,resetPassword,userLogin };
