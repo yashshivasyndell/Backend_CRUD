@@ -2,7 +2,7 @@ const User = require("../models/productmodel");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const { use } = require("../routes/Authroute");
+
 
 //sign up
 const signup = async (req, res) => {
@@ -70,7 +70,7 @@ const login = async (req, res) => {
   try {
     const {
       email,
-      password,
+      password
     } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
@@ -79,6 +79,7 @@ const login = async (req, res) => {
         success: false,
       });
     }
+   
     const isPassEqual = await bcrypt.compare(password, user.password);
     if (!isPassEqual) {
       return res
@@ -87,7 +88,7 @@ const login = async (req, res) => {
     }
     
     const jwtToken = jwt.sign(
-      { email: user.email, _id: user._id },
+      { email: user.email, _id: user._id,role:user.role },
       process.env.jwt_secret,
       { expiresIn: "24h" }
     );
@@ -100,7 +101,8 @@ const login = async (req, res) => {
         jwtToken,
         email,
         name: user.name,
-        user: user
+        user: user,
+        role:user.role
       });
       
   } catch (error) {
@@ -113,46 +115,6 @@ const login = async (req, res) => {
   }
 };
 
-//User login
-const userLogin =async (req,res)=>{
-  try{const {email,password} = req.body
-
-  const normalUser =await User.findOne({email})
-  const UserPassCompare = await bcrypt.compare(password,normalUser.password)
-  if(!UserPassCompare){
-    res.status(401).json({
-      message:'Wrong email or not existing',
-      success:false
-    })
-  }
-
-  const UserJwt = jwt.sign(
-    { email: normalUser.email, _id: normalUser._id },
-      process.env.jwt_secret,
-      { expiresIn: "24h" }
-  )
-
-  const UserCookie = {
-    httpOnly:true
-  }
-  res.status(200).cookie("UserToken", UserJwt , UserCookie).json({
-    message: "User Logged In successfully",
-    success: true,
-    UserJwt,
-    email,
-    name: normalUser.name,
-    user: normalUser
-  })
-}catch(error){
-  console.log(error);
-  res.status(500).json({
-    message: "Internal server error is there",
-    error: error,
-    success: false,
-  });
-  }
-  
-}
 //Clear cookies
 const clearcookies = (req, res) => {
   try {
@@ -253,4 +215,4 @@ const loadUser = async (req, res) => {
 
 
 
-module.exports = { signup, login,loadUser,clearcookies,resetPassword,userLogin };
+module.exports = { signup, login,loadUser,clearcookies,resetPassword   };

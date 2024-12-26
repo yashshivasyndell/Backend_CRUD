@@ -1,4 +1,4 @@
-const {signup,login, loadUser,clearcookies, resetPassword, userLogin} = require('../controllers/AuthControllers');
+const {signup,login, loadUser,clearcookies, resetPassword} = require('../controllers/AuthControllers');
 const sender = require('../controllers/Mailsender');
 const isAuthenticated = require('../middlewares/authMiddleware');
 const {signupValidation,loginValidation} = require('../middlewares/AuthValidation');
@@ -7,7 +7,7 @@ const router = require('express').Router();
 
 router.post('/adminlogin',loginValidation,login);
 
-router.post('/login',loginValidation,userLogin);
+router.post('/login',loginValidation);
 
 router.post("/signup",signupValidation,signup)
 

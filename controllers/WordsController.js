@@ -1,5 +1,6 @@
 const Words = require('../models/words');
-
+const Notification = require('../models/notification');
+const allUser = require('../models/allUser');
 const createWord = async (req, res) => {
     try {
         const { language, level, category, word, sentence } = req.body;
@@ -9,6 +10,18 @@ const createWord = async (req, res) => {
         }
         const newWord = new Words({ language, level, category, word, sentence });
         await newWord.save();
+
+        const users = await allUser.find({ role: { $ne: 'admin' } });
+
+        const notifications = users.map(user => {
+            return new Notification({
+              userId: user._id,
+              message: `A new word has been added: "${word}"!`,
+            });
+          });
+          console.log(notifications);
+          await Notification.insertMany(notifications);
+
         res.status(201).json(newWord);
     } catch (error) {
         console.error(error);
@@ -108,6 +121,18 @@ const deleteHomonym = async (req, res) => {
     }
 };
 
+//Notification
+const getNotifications  = async(req,res)=>{
+   try{
+    const userId = req.id;
+    console.log(userId);
+    const notification = await Notification.find()
+    res.status(200).json(notification)
+}catch(error){
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Server error occurred'});
+}
+}
 
-module.exports = {createWord,deleteWord,addWordWithHomonym,deleteHomonym}
+module.exports = {createWord,deleteWord,addWordWithHomonym,deleteHomonym,getNotifications}
 

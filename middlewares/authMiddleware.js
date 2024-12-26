@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const isAuthenticated = async (req, res, next) => {
   try {
-    console.log(req.cookies);
+    
     const {AuthToken} = req.cookies;
 
     if (!AuthToken) {
@@ -20,11 +20,11 @@ const isAuthenticated = async (req, res, next) => {
       return res.status(401).json({ message: 'Token has expired' });
     }
 
-    console.log("this is decoded token",decodedtoken);
-    console.log("token is not expired");
+    console.log("success he");
     req.id = decodedtoken._id;
     next();
   } catch (error) {
+    console.log("Error ho gyi!!");
     console.log("error: ", error);
   }
 };
