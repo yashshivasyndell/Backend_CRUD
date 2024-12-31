@@ -1,6 +1,7 @@
 const Words = require('../models/words');
 const Notification = require('../models/notification');
-const allUser = require('../models/allUser');
+const { Socket } = require('socket.io');
+
 const createWord = async (req, res) => {
     try {
         const { language, level, category, word, sentence } = req.body;
@@ -9,18 +10,34 @@ const createWord = async (req, res) => {
             return res.status(400).json({ message: 'Word already exists' });
         }
         const newWord = new Words({ language, level, category, word, sentence });
-        await newWord.save();
+        const wordSuccess = await newWord.save();
+        if(wordSuccess){
+            const newNotif = new Notification({
+                userId:newWord._id,
+                message:`${word}`,
+                createdAt:new Date()
+            })
+            await newNotif.save()
 
-        const users = await allUser.find({ role: { $ne: 'admin' } });
+           
+            
+            // Emit a 'newWord' event to all connected clients
+            req.io.emit('newWord', {
+                message: 'A new word has been added successfully!',
+                word: wordSuccess,
+                notification: newNotif,
+            })
+            console.log('Event emitted to all clients');
 
-        const notifications = users.map(user => {
-            return new Notification({
-              userId: user._id,
-              message: `A new word has been added: "${word}"!`,
+            return res.status(201).json({
+                message: 'Word created successfully',
+                word: wordSuccess,
+                notification: newNotif,
             });
-          });
-          console.log(notifications);
-          await Notification.insertMany(notifications);
+
+        }else{
+            res.status(500).json({message:'error in server'})
+        }
 
         res.status(201).json(newWord);
     } catch (error) {
@@ -124,8 +141,6 @@ const deleteHomonym = async (req, res) => {
 //Notification
 const getNotifications  = async(req,res)=>{
    try{
-    const userId = req.id;
-    console.log(userId);
     const notification = await Notification.find()
     res.status(200).json(notification)
 }catch(error){
@@ -134,5 +149,28 @@ const getNotifications  = async(req,res)=>{
 }
 }
 
-module.exports = {createWord,deleteWord,addWordWithHomonym,deleteHomonym,getNotifications}
+//Notifiacation status
+const isNotificationSeen = async (req,res)=>{
+    try{
+    const noOfnotification = await Notification.countDocuments({seen:false})
+    return res.status(200).json({noOfnotification})}
+    catch(error){
+        console.log("error in getting no of notification");
+        res.json({error})
+    }
+}
+
+//Notification status marking
+const markNotification = async (req,res)=>{
+    try{
+      const markedSeen = await Notification.updateMany({seen:true})
+      res.status(200).json({message:"all notifications marked seen"})
+    }catch(error){
+    res.status(500).json({message:"Error in marking!"})
+    }
+}
+
+module.exports = {createWord,deleteWord,addWordWithHomonym,
+    deleteHomonym,getNotifications,
+    isNotificationSeen,markNotification}
 
