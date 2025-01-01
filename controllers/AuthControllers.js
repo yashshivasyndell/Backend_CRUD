@@ -134,11 +134,11 @@ const clearcookies = (req, res) => {
     });
   }
 };
+
 //load user
 const loadUser = async (req, res) => {
   try {
     const userId = req.id;
-     
     if (!userId) {
       return res.status(400).json({ message: 'User ID is missing' });
     }
@@ -157,7 +157,7 @@ const loadUser = async (req, res) => {
   const resetPassword = async (req, res) => {
     try {
       const { Password, NewPassword, ConformPassword } = req.body;
-      const userId = req.id;
+      let userId = req.id;
       console.log("user id is: ",userId);
       console.log(req.body);
       if (!Password || !NewPassword || !ConformPassword) {

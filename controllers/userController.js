@@ -1,4 +1,6 @@
-const allUser = require('../models/allUser')
+const { json } = require('body-parser');
+const allUser = require('../models/allUser');
+const User = require('../models/productmodel')
 
 const getData = async (req,res)=>{
     try{
@@ -15,4 +17,21 @@ const getData = async (req,res)=>{
     }
 }
 
-module.exports = getData
+const getUsers = async (req,res)=>{
+    try{
+        const allUsers = await User.find().select("id name")
+    
+        res.status(200).json({
+            allUsers,
+            success:true
+        })
+    }catch(error){
+        res.status(500).json({
+            message:'error in fetching user',
+            cause:error.message
+        })
+    }
+
+}
+
+module.exports = {getData,getUsers}

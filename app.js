@@ -11,12 +11,13 @@ const cookieParser = require('cookie-parser');
 const Authroute = require('./routes/Authroute');
 const dataRoute = require('./routes/dataRoute');
 const wordsRoute = require('./routes/wordsRoute');
+const ChatRoute = require('./routes/ChatRoute')
 
 const server = http.createServer(app);
 
 const io = socketIO(server, {
     cors: {
-        origin: "http://localhost:5173",  // Your frontend URL
+        origin: "http://localhost:5173",  
         methods: ["GET", "POST"],
         allowedHeaders: ["Content-Type"],
         credentials: true,
@@ -45,18 +46,28 @@ app.use(express.json());
 app.use('/auth', Authroute);
 app.use('/users', dataRoute);
 app.use('/words', wordsRoute);
+app.use('/chat',ChatRoute)
 
 // Test route
 app.get("/", (req, res) => {
     res.send("Welcome");
 });
-
+const userSockets = {};
+io.userSockets = userSockets
 // Socket.IO event handling
 io.on("connection", (socket) => {
-    console.log("A user connected");
+    console.log(`A client connected with socket ID: ${socket.id}`);
 
+    
     socket.on("disconnect", () => {
-        console.log("A user disconnected");
+        for (const userId in userSockets) {
+            if (userSockets[userId] === socket.id) {
+              delete userSockets[userId]; 
+              console.log(`User ${userId} disconnected`);
+              break;
+            }
+          }
+      
     });
 });
 

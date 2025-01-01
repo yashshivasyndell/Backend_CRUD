@@ -18,9 +18,6 @@ const createWord = async (req, res) => {
                 createdAt:new Date()
             })
             await newNotif.save()
-
-           
-            
             // Emit a 'newWord' event to all connected clients
             req.io.emit('newWord', {
                 message: 'A new word has been added successfully!',
