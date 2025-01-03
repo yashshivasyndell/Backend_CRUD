@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const app = express();
 require("dotenv").config();
 const http = require("http");
@@ -11,13 +10,14 @@ const cookieParser = require('cookie-parser');
 const Authroute = require('./routes/Authroute');
 const dataRoute = require('./routes/dataRoute');
 const wordsRoute = require('./routes/wordsRoute');
-const ChatRoute = require('./routes/ChatRoute')
-
+const ChatRoute = require('./routes/ChatRoute');
+const Database  = require("./DB_connection/Db_conn");
+const URL = process.env.url
 const server = http.createServer(app);
 
 const io = socketIO(server, {
     cors: {
-        origin: "http://localhost:5173",  
+        origin: URL,
         methods: ["GET", "POST"],
         allowedHeaders: ["Content-Type"],
         credentials: true,
@@ -57,19 +57,25 @@ io.userSockets = userSockets
 // Socket.IO event handling
 io.on("connection", (socket) => {
     console.log(`A client connected with socket ID: ${socket.id}`);
+    // Listen for a 'registerUser' event to map the user ID to the socket ID
+    socket.on("registerUser", (userId) => {
+        console.log("iam triggered");
+        io.userSockets[userId] = socket.id;
+        console.log(`User registered: ${userId} with socket ID: ${socket.id}`);
+    });
 
-    
+    // Handle user disconnection
     socket.on("disconnect", () => {
-        for (const userId in userSockets) {
-            if (userSockets[userId] === socket.id) {
-              delete userSockets[userId]; 
-              console.log(`User ${userId} disconnected`);
-              break;
-            }
-          }
-      
+        const userId = Object.keys(io.userSockets).find(
+            (key) => io.userSockets[key] === socket.id
+        );
+        if (userId) {
+            delete io.userSockets[userId];
+            console.log(`User ${userId} disconnected`);
+        }
     });
 });
+
 
 // Start server (use server.listen instead of app.listen)
 server.listen(PORT, () => {
@@ -77,8 +83,4 @@ server.listen(PORT, () => {
 });
 
 // MongoDB connection
-mongoose.connect(db).then(() => {
-    console.log("DB connected");
-}).catch((e) => {
-    console.error("DB connection error:", e);
-});
+Database() 

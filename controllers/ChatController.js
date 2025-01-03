@@ -6,7 +6,7 @@ const saveChat = async (req, res) => {
     const { sender, receiver, message, timestamp, messageType, read } =
       req.body;
     let senderUser = req.id;
-
+    console.log("this is sender user: ",senderUser); 
     const receiverUser = await User.findById(receiver);
     if (!senderUser || !receiverUser) {
       return res.status(404).json({ message: "sender or receiver not found" });
@@ -21,7 +21,7 @@ const saveChat = async (req, res) => {
     });
     const saveMessage = await newMessage.save();
 
-    req.io.emit("messageSent", {
+    req.io.to(receiver).emit("messageSent", {
       message: saveMessage.message,
       sender: saveMessage.sender,
       receiver: saveMessage.receiver,
@@ -29,8 +29,8 @@ const saveChat = async (req, res) => {
       messageType: saveMessage.messageType,
       read: saveMessage.read, 
     });
-    console.log(`message sent to ${receiver} by this id ${sender}`);
-
+    
+    console.log(`message sent to ${receiver} by this id ${senderUser}`);
     return res
       .status(200)
       .json({ message: "message saved successfully", chat: saveMessage });
