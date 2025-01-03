@@ -20,15 +20,20 @@ const saveChat = async (req, res) => {
       read,
     });
     const saveMessage = await newMessage.save();
-
-    req.io.to(receiver).emit("messageSent", {
-      message: saveMessage.message,
-      sender: saveMessage.sender,
-      receiver: saveMessage.receiver,
-      timestamp: saveMessage.timestamp,
-      messageType: saveMessage.messageType,
-      read: saveMessage.read, 
-    });
+    const receiverSocketId = req.io.userSockets[receiver];
+    if (receiverSocketId) {
+      // Emit the message to the receiver's socket
+      req.io.to(receiverSocketId).emit("messageSent", {
+        message: saveMessage.message,
+        sender: saveMessage.sender,
+        receiver: saveMessage.receiver,
+        timestamp: saveMessage.timestamp,
+        messageType: saveMessage.messageType,
+        read: saveMessage.read,
+      });
+    } else {
+      console.log(`Receiver (${receiver}) is not connected.`);
+    }
     
     console.log(`message sent to ${receiver} by this id ${senderUser}`);
     return res
